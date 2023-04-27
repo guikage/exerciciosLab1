@@ -2,6 +2,21 @@
 #include <stdlib.h>
 #include <stdbool.h>
 
+float opera(float a, float b, char op){
+    switch (op){
+        case '+':
+            return a+b;
+        case '-':
+            return a-b;
+        case '*':
+            return a*b;
+        case '/':
+            return a/b;
+        default:
+            return a;
+    }
+}
+
 int main(){
     float a = 0.0;
     float b = 0.0;
@@ -12,10 +27,7 @@ int main(){
         op = getchar();
         if (op == '\n') break;
         scanf("%f", &b);
-        if (op == '+') a = a + b;
-        else if (op == '-') a = a - b;
-        else if (op == '*') a = a * b;
-        else if (op == '/') a = a / b; 
+        a = opera(a, b, op);
     }
 
     printf("RESULTADO: %.2f\n", a);
