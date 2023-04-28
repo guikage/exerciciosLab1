@@ -1,6 +1,4 @@
 #include <stdio.h>
-#include <stdlib.h>
-#include <stdbool.h>
 
 float opera(float a, float b, char op){
     switch (op){
