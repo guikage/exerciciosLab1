@@ -13,7 +13,7 @@ float opera(float a, float b, char op){
         case '/':
             return a/b;
         default:
-            return a;
+            return a+b;
     }
 }
 
