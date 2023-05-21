@@ -23,7 +23,7 @@ void limpatela(void){
 }
 
 void limpatudo(void){
-    printf("\033[2J\033[3J");
+    printf("\033[H\033[2J\033[3J");
 }
 
 void barras(int lin, int col, int r, int g, int b){
@@ -106,57 +106,87 @@ int pontuacao(int randr, int randg, int randb, int r, int g, int b){
     return (100 - pontos);
 }
 
+int gerenciaplacar(int placar[3], int pontos){
+    if (pontos >= placar[0]){
+        placar[2] = placar[1];
+        placar[1] = placar[0];
+        placar[0] = pontos;
+        return 1;
+    } else if (pontos >= placar[1]){
+        placar[2] = placar[1];
+        placar[1] = pontos;
+        return 2;
+    } else if (pontos >= placar[2]){
+        placar[2] = pontos;
+        return 3;
+    } else return 0;
+}
+
 int main(){
     srand(time(0));
     int r = 0, g = 0, b = 0, linha = 1;
     int tentativas = 3, pontos;
     int randr, randg, randb;
-    limpatudo();
+    int placar[3] = {0, 0, 0};
+    int posicaoplacar;
+    char continuar;
+    do{
+        limpatudo();
+        linha = 1;
 
-    randr = rand()%255;
-    randg = rand()%255;
-    randb = rand()%255;
-    quadrado(linha, 1, randr, randg, randb);
-    linha += 6;
-
-    for(int i = 0; i < tentativas; i++){
-        pegargb(linha, 1, &r, &g, &b);
-        linha += 4;
+        randr = rand()%255;
+        randg = rand()%255;
+        randb = rand()%255;
         quadrado(linha, 1, randr, randg, randb);
-        quadrado(linha, 7, r, g, b);
-        barras(linha, 13, r, g, b);
         linha += 6;
-    }
-    limpatela();
 
-    pontos = pontuacao(randr, randg, randb, r, g, b);
-    poscursor(1, 1);
-    printf("PONTUACAO: %d\n\n", pontos);
-    
-    printf("COR ALEATORIA:");
-    quadrado(5, 1, randr, randg, randb);
-    barras(5, 7, randr, randg, randb);
-    poscursor(5, 33);
-    printf("%d", randr);
-    poscursor(7, 33);
-    printf("%d", randg);
-    poscursor(9, 33);
-    printf("%d", randb);
-    poscursor(11, 1);
-    
-    printf("COR DO USUARIO:");
-    quadrado(13, 1, r, g, b);
-    barras(13, 7, r, g, b);
-    poscursor(13, 33);
-    printf("%d", r);
-    poscursor(15, 33);
-    printf("%d", g);
-    poscursor(17, 33);
-    printf("%d", b);
-    
-    creset();
-    getchar();
-    getchar();
-    limpatudo();
+        for(int i = 0; i < tentativas; i++){
+            pegargb(linha, 1, &r, &g, &b);
+            linha += 4;
+            quadrado(linha, 1, randr, randg, randb);
+            quadrado(linha, 7, r, g, b);
+            barras(linha, 13, r, g, b);
+            linha += 6;
+        }
+        limpatela();
+
+        pontos = pontuacao(randr, randg, randb, r, g, b);
+        poscursor(1, 1);
+        posicaoplacar = gerenciaplacar(placar, pontos);
+        printf("PONTUACAO: %d ", pontos);
+        if (posicaoplacar != 0) printf("(%do lugar)", posicaoplacar);
+
+        poscursor(3, 1);
+        printf("COR ALEATORIA:");
+        quadrado(5, 1, randr, randg, randb);
+        barras(5, 7, randr, randg, randb);
+        poscursor(5, 33);
+        printf("%d", randr);
+        poscursor(7, 33);
+        printf("%d", randg);
+        poscursor(9, 33);
+        printf("%d", randb);
+        poscursor(11, 1);
+        
+        printf("COR DO USUARIO:");
+        quadrado(13, 1, r, g, b);
+        barras(13, 7, r, g, b);
+        poscursor(13, 33);
+        printf("%d", r);
+        poscursor(15, 33);
+        printf("%d", g);
+        poscursor(17, 33);
+        printf("%d", b);
+
+        poscursor(19, 1);
+        printf("MELHORES PONTUACOES: \n");
+        printf("%d, %d, %d", placar[0], placar[1], placar[2]);
+
+        poscursor(23, 1);
+        printf("CONTINUAR? (s/n) ");
+        scanf(" %c", &continuar);
+        
+        creset();
+    }while(continuar != 'n');
     return 0;
 }
