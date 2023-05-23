@@ -1,7 +1,6 @@
 #include <stdlib.h>
 #include <stdio.h>
 #include <time.h>
-#include <string.h>
 
 void ctexto(int r, int g, int b){
     printf("\033[38;2;%d;%d;%dm", r, g, b);
@@ -30,22 +29,34 @@ void limpatudo(void){
 void barras(int lin, int col, int r, int g, int b){
     poscursor(lin, col);
     for(int i = 0; i < 26; i++){
-        if (r/10 == i) cfundo(255, 255, 255); //branco
-        else cfundo(i*10, 0, 0); //vermelho
+        if (r/10 == i){
+            cfundo(255, 255, 255); //branco
+        } else {
+            cfundo(i*10, 0, 0); //vermelho
+        }
         putchar(' ');
     }
+    
     poscursor(lin+2, col);
     for(int i = 0; i < 26; i++){
-        if (g/10 == i) cfundo(255, 255, 255); //branco
-        else cfundo(0, i*10, 0); //verde
+        if (g/10 == i){
+            cfundo(255, 255, 255); //branco
+        } else {
+            cfundo(0, i*10, 0); //verde
+        }
         putchar(' ');
     }
+    
     poscursor(lin+4, col);
     for(int i = 0; i < 26; i++){
-        if (b/10 == i) cfundo(255, 255, 255); //branco
-        else cfundo(0, 0, i*10); //azul
+        if (b/10 == i){
+            cfundo(255, 255, 255); //branco
+        } else {
+            cfundo(0, 0, i*10); //azul
+        }
         putchar(' ');
     }
+
     creset();
 }
 
@@ -57,6 +68,7 @@ void quadrado(int lin, int col, int r, int g, int b){
             putchar(' ');
         }
     }
+
     creset();
 }
 
@@ -94,60 +106,54 @@ int pontuacao(int randr, int randg, int randb, int r, int g, int b){
     return (100 - pontos);
 }
 
-int gerenciaplacar(int placar[5], int pontos, char nomes[][4]){
-    char cnome[4];
-    if (pontos > placar[4]) placar[4] = pontos;
-    for (int i = 0; i < 5; i++){
-        for (int j = i; j < 5; j++){
-            if (placar[i] < placar[j]){
-                int c = placar[i];
-                placar[i] = placar[j];
-                placar[j] = c;
-                strcpy(cnome, nomes[i]);
-                strcpy(nomes[i], nomes[j]);
-                strcpy(nomes[j], cnome);
-            }
-        }
-    }
-    for (int i = 0; i < 5; i++){
-        if(pontos >= placar[i]) return (i+1);
-    }
-    return 0;
-}
-
-void flushstdin(){ 
-    int ch;
-    while((ch = fgetc(stdin)) != EOF && ch != '\n'){} 
+int gerenciaplacar(int placar[3], int pontos){
+    if (pontos >= placar[0]){
+        placar[2] = placar[1];
+        placar[1] = placar[0];
+        placar[0] = pontos;
+        return 1;
+    } else if (pontos >= placar[1]){
+        placar[2] = placar[1];
+        placar[1] = pontos;
+        return 2;
+    } else if (pontos >= placar[2]){
+        placar[2] = pontos;
+        return 3;
+    } else return 0;
 }
 
 int main(){
     srand(time(0));
-    int r = 0, g = 0, b = 0;
+    int r = 0, g = 0, b = 0, linha = 1;
+    int tentativas = 3, pontos;
     int randr, randg, randb;
-    int pontos, posicaoplacar;
-    int placar[5] = {0, 0, 0, 0, 0};
-    char nomes[5][4] = {"AAA", "AAA", "AAA", "AAA", "AAA"};
+    int placar[3] = {0, 0, 0};
+    int posicaoplacar;
     char continuar;
+    int tempoinicio = time(0);
     do{
         limpatudo();
+        linha = 1;
 
         randr = rand()%255;
         randg = rand()%255;
         randb = rand()%255;
-        quadrado(1, 1, randr, randg, randb);
+        quadrado(linha, 1, randr, randg, randb);
+        linha += 6;
 
-        for(int i = 0; i < 5; i++){
-            pegargb(7, 1, &r, &g, &b);
-            limpatela();
-            quadrado(1, 1, randr, randg, randb);
-            quadrado(1, 7, r, g, b);
-            barras(1, 13, r, g, b);
+        for(int i = 0; i < tentativas; i++){
+            pegargb(linha, 1, &r, &g, &b);
+            linha += 4;
+            quadrado(linha, 1, randr, randg, randb);
+            quadrado(linha, 7, r, g, b);
+            barras(linha, 13, r, g, b);
+            linha += 6;
         }
         limpatela();
 
         pontos = pontuacao(randr, randg, randb, r, g, b);
         poscursor(1, 1);
-        posicaoplacar = gerenciaplacar(placar, pontos, nomes);
+        posicaoplacar = gerenciaplacar(placar, pontos);
         printf("PONTUACAO: %d ", pontos);
         if (posicaoplacar != 0) printf("(%do lugar)", posicaoplacar);
 
@@ -173,32 +179,18 @@ int main(){
         poscursor(17, 33);
         printf("%d", b);
 
-        if(posicaoplacar != 0){
-            poscursor(19, 1);
-            printf("DIGITE SEU NOME: ___");
-            getchar();
-            poscursor(19, 18);
-            fgets(nomes[posicaoplacar-1], 4, stdin);
-            flushstdin();
-        }
+        poscursor(19, 1);
+        printf("MELHORES PONTUACOES: \n");
+        printf("%d, %d, %d", placar[0], placar[1], placar[2]);
 
-        poscursor(21, 1);
+        poscursor(23, 1);
         printf("CONTINUAR? (s/n) ");
         scanf(" %c", &continuar);
         
         creset();
     }while(continuar != 'n');
-    limpatela();
-    poscursor(1, 1);
-    printf("MELHORES PONTUACOES:");
-    poscursor(3, 1);
-    for(int i = 0; i < 5; i++){
-        if(placar[i] != 0) printf("%3s: %03d\n", nomes[i], placar[i]);
-    }
-    poscursor(10, 1);
-    printf("PRESSIONE ENTER PARA SAIR");
-    getchar();
-    getchar();
-
+    limpatudo();
+    int tempofim = time(0);
+    printf("%d\n", tempofim-tempoinicio);
     return 0;
 }
