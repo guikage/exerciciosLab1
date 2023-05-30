@@ -1,96 +1,35 @@
 #include <stdlib.h>
 #include <stdio.h>
 #include <time.h>
+#include <string.h>
+#include <stdbool.h>
 
-void ctexto(int r, int g, int b){
-    printf("\033[38;2;%d;%d;%dm", r, g, b);
-}
+#include "tela.h"
 
-void cfundo(int r, int g, int b){
-    printf("\033[48;2;%d;%d;%dm", r, g, b);
-}
-
-void creset(void){
-    printf("\033[m");
-}
-
-void poscursor(int lin, int col){
-    printf("\033[%d;%dH", lin, col);
-}
-
-void limpatela(void){
-    printf("\033[2J");
-}
-
-void limpatudo(void){
-    printf("\033[H\033[2J\033[3J");
-}
-
-void barras(int lin, int col, int r, int g, int b){
-    poscursor(lin, col);
+void barra(int lin, int col, char cor, int valor){
+    tela_lincol(lin, col);
+    int r = 0, g = 0, b = 0;
+    if(cor == 'r') r = 10;
+    if(cor == 'g') g = 10;
+    if(cor == 'b') b = 10;
     for(int i = 0; i < 26; i++){
-        if (r/10 == i){
-            cfundo(255, 255, 255); //branco
-        } else {
-            cfundo(i*10, 0, 0); //vermelho
-        }
+        if (valor/10 == i) tela_cor_fundo(255, 255, 255); //branco
+        else tela_cor_fundo(i*r, i*g, i*b); //cor escolhida
         putchar(' ');
     }
-    
-    poscursor(lin+2, col);
-    for(int i = 0; i < 26; i++){
-        if (g/10 == i){
-            cfundo(255, 255, 255); //branco
-        } else {
-            cfundo(0, i*10, 0); //verde
-        }
-        putchar(' ');
-    }
-    
-    poscursor(lin+4, col);
-    for(int i = 0; i < 26; i++){
-        if (b/10 == i){
-            cfundo(255, 255, 255); //branco
-        } else {
-            cfundo(0, 0, i*10); //azul
-        }
-        putchar(' ');
-    }
-
-    creset();
+    tela_cor_normal();
+    printf("%03d", valor);
 }
 
 void quadrado(int lin, int col, int r, int g, int b){
-    cfundo(r, g, b);
+    tela_cor_fundo(r, g, b);
     for(int i = 0; i < 5; i++){
-        poscursor(lin+i, col);
+        tela_lincol(lin+i, col);
         for(int j = 0; j < 5; j++){
             putchar(' ');
         }
     }
-
-    creset();
-}
-
-void pegargb(int lin, int col, int *r, int *g, int *b){
-    poscursor(lin, col);
-    printf("R: ");
-    poscursor(lin+1, col);
-    printf("G: ");
-    poscursor(lin+2, col);
-    printf("B: ");
-    poscursor(lin, col+3);
-    scanf("%d", r);
-    poscursor(lin+1, col+3);
-    scanf("%d", g);
-    poscursor(lin+2, col+3);
-    scanf("%d", b);
-    if (*r > 255) *r = 255;
-    if (*g > 255) *g = 255;
-    if (*b > 255) *b = 255;
-    if (*r < 0) *r = 0;
-    if (*g < 0) *g = 0;
-    if (*b < 0) *b = 0;
+    tela_cor_normal();
 }
 
 int pontuacao(int randr, int randg, int randb, int r, int g, int b){
@@ -101,96 +40,175 @@ int pontuacao(int randr, int randg, int randb, int r, int g, int b){
     int difb = b - randb;
     if (difb < 0) difb *= -1;
 
-    int soma = difr + difg + difb;
-    int pontos = soma / 7.65;
-    return (100 - pontos);
+    int difmaxr = randr, difmaxg = randg, difmaxb = randb;
+    if (randr < 128) difmaxr = 255 - randr;
+    if (randg < 128) difmaxg = 255 - randg;
+    if (randb < 128) difmaxb = 255 - randb;
+
+    float finalr = (float)difr / difmaxr * 100;
+    float finalg = (float)difg / difmaxg * 100;
+    float finalb = (float)difb / difmaxb * 100;
+
+    float pontos = 100 - (finalr + finalg + finalb)/3;
+    return (int)pontos;
 }
 
-int gerenciaplacar(int placar[3], int pontos){
-    if (pontos >= placar[0]){
-        placar[2] = placar[1];
-        placar[1] = placar[0];
-        placar[0] = pontos;
-        return 1;
-    } else if (pontos >= placar[1]){
-        placar[2] = placar[1];
-        placar[1] = pontos;
-        return 2;
-    } else if (pontos >= placar[2]){
-        placar[2] = pontos;
-        return 3;
-    } else return 0;
+int gerenciaplacar(int placar[5], int pontos, char nomes[][4]){
+    for (int i = 0; i < 5; i++){
+        if(pontos > placar[i]){
+            for (int j = 4; j > i; j--){
+                placar[j] = placar[j-1];
+                strcpy(nomes[j], nomes[j-1]);
+            }
+            placar[i] = pontos;
+            return (i+1);
+        }
+    }
+    return 0;
+}
+
+void flushstdin(){ 
+    int ch;
+    while((ch = fgetc(stdin)) != EOF && ch != '\n'){} 
+}
+
+void muda_valor(int *cor, int tecla){
+    switch (tecla){
+        case c_left:
+            if (*cor > 0) (*cor)--;
+            break;
+        case c_right:
+            if (*cor < 255) (*cor)++;
+            break;
+        case 'a':
+            if (*cor > 0) (*cor)--;
+            break;
+        case 'd':
+            if (*cor < 255) (*cor)++;
+            break;
+        case 'D':
+            if (*cor > 9) *cor-=10;
+            else *cor = 0;
+            break;
+        case 'C':
+            if (*cor < 246) *cor+=10;
+            else *cor = 255;
+            break;
+    }
+    return;
 }
 
 int main(){
     srand(time(0));
-    int r = 0, g = 0, b = 0, linha = 1;
-    int tentativas = 3, pontos;
+    tela_mostra_cursor(false);
+    int r = 0, g = 0, b = 0;
     int randr, randg, randb;
-    int placar[3] = {0, 0, 0};
-    int posicaoplacar;
+    int pontos, posicaoplacar, tecla, cor = 0;
+    double tempo, inicio;
+    int placar[5] = {0, 0, 0, 0, 0};
+    char nomes[5][4] = {"AAA", "AAA", "AAA", "AAA", "AAA"};
     char continuar;
-    int tempoinicio = time(0);
     do{
-        limpatudo();
-        linha = 1;
+        flushstdin();
+        tela_cria();
+        tela_limpa();
 
         randr = rand()%255;
         randg = rand()%255;
         randb = rand()%255;
-        quadrado(linha, 1, randr, randg, randb);
-        linha += 6;
+        r = 0;
+        g = 0;
+        b = 0;
+        quadrado(1, 1, randr, randg, randb);
+        quadrado(1, 7, r, g, b);
+        barra(1, 13, 'r', r);
+        barra(3, 13, 'g', g);
+        barra(5, 13, 'b', b);
 
-        for(int i = 0; i < tentativas; i++){
-            pegargb(linha, 1, &r, &g, &b);
-            linha += 4;
-            quadrado(linha, 1, randr, randg, randb);
-            quadrado(linha, 7, r, g, b);
-            barras(linha, 13, r, g, b);
-            linha += 6;
-        }
-        limpatela();
+        inicio = tela_relogio();
+        do{
+            tempo = tela_relogio() - inicio;
+            tecla = tela_le_char();
+            if (tecla == c_up || tecla == 'w'){
+                if (cor > 0) cor--;
+            } else if (tecla == c_down || tecla == 's'){
+                if (cor < 2) cor++;
+            } else {
+                switch (cor){
+                    case 0:
+                        muda_valor(&r, tecla);
+                        barra(1, 13, 'r', r);
+                        break;
+                    case 1:
+                        muda_valor(&g, tecla);
+                        barra(3, 13, 'g', g);
+                        break;
+                    case 2:
+                        muda_valor(&b, tecla);
+                        barra(5, 13, 'b', b);
+                        break;
+                }
+            }
+
+            quadrado(1, 7, r, g, b);
+            pontos = pontuacao(randr, randg, randb, r, g, b);
+            tela_lincol(7, 1);
+            printf("PONTUACAO: %03d", pontos);
+            tela_lincol(1, 1);
+            printf("%d", cor);
+        }while(tempo <= 10);
+        tela_destroi();
+        tela_limpa();
 
         pontos = pontuacao(randr, randg, randb, r, g, b);
-        poscursor(1, 1);
-        posicaoplacar = gerenciaplacar(placar, pontos);
+        posicaoplacar = gerenciaplacar(placar, pontos, nomes);
+        tela_lincol(1, 1);
         printf("PONTUACAO: %d ", pontos);
         if (posicaoplacar != 0) printf("(%do lugar)", posicaoplacar);
 
-        poscursor(3, 1);
-        printf("COR ALEATORIA:");
+        //imprime cor gerada
+        tela_lincol(3, 1);
+        printf("COR GERADA:");
         quadrado(5, 1, randr, randg, randb);
-        barras(5, 7, randr, randg, randb);
-        poscursor(5, 33);
-        printf("%d", randr);
-        poscursor(7, 33);
-        printf("%d", randg);
-        poscursor(9, 33);
-        printf("%d", randb);
-        poscursor(11, 1);
+        barra(5, 7, 'r', randr);
+        barra(7, 7, 'g', randg);
+        barra(9, 7, 'b', randb);
         
+        //imprime cor do usuario
+        tela_lincol(11, 1);
         printf("COR DO USUARIO:");
         quadrado(13, 1, r, g, b);
-        barras(13, 7, r, g, b);
-        poscursor(13, 33);
-        printf("%d", r);
-        poscursor(15, 33);
-        printf("%d", g);
-        poscursor(17, 33);
-        printf("%d", b);
+        barra(13, 7, 'r', r);
+        barra(15, 7, 'g', g);
+        barra(17, 7, 'b', b);
 
-        poscursor(19, 1);
-        printf("MELHORES PONTUACOES: \n");
-        printf("%d, %d, %d", placar[0], placar[1], placar[2]);
+        //pega o nome se estiver no placar
+        if(posicaoplacar != 0){
+            tela_lincol(19, 1);
+            printf("DIGITE SEU NOME: ___");
+            tela_lincol(19, 18);
+            fgets(nomes[posicaoplacar-1], 4, stdin);
+            flushstdin();
+        }
 
-        poscursor(23, 1);
+        tela_lincol(21, 1);
         printf("CONTINUAR? (s/n) ");
         scanf(" %c", &continuar);
         
-        creset();
-    }while(continuar != 'n');
-    limpatudo();
-    int tempofim = time(0);
-    printf("%d\n", tempofim-tempoinicio);
+        tela_cor_normal();
+    }while(continuar == 's');
+    tela_limpa();
+
+    tela_lincol(1, 1);
+    printf("MELHORES PONTUACOES:");
+    tela_lincol(3, 1);
+    for(int i = 0; i < 5; i++){
+        if(placar[i] != 0) printf("%3s: %03d\n", nomes[i], placar[i]); //imprime todas as pontuacoes maiores do que 0 (pq 0 eh triste)
+    }
+    tela_lincol(10, 1);
+    printf("PRESSIONE ENTER PARA SAIR");
+    getchar();
+    getchar();
+
     return 0;
 }
