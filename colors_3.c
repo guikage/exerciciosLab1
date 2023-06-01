@@ -93,6 +93,7 @@ int gerencia_placar(float pontos, float placar[5], char nomes[5][4]){
                 strcpy(nomes[j], nomes[j-1]);
             }
             placar[i] = pontos;
+            grava_arquivo(placar, nomes);
             return (i+1);
         }
     }
@@ -143,7 +144,6 @@ void gera_posicao(estado partida, float placar[5], char nomes[5][4]){
         printf("VOCE FICOU EM %do LUGAR\nDIGITE SEU NOME: ___", posicao);
         tela_lincol(21, 18);
         pega_nome(nomes, posicao-1, 21, 18);
-        grava_arquivo(placar, nomes);
     }
 }
 
