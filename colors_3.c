@@ -9,12 +9,6 @@
 #define TMAX 30.0
 
 typedef struct{
-    int r;
-    int g;
-    int b;
-} cor;
-
-typedef struct{
     bool fim;
     cor cuser;
     cor crand;
@@ -24,11 +18,24 @@ typedef struct{
     double tempo;
 } estado;
 
-const cor RED = {1, 0, 0};
-const cor GREEN = {0, 1, 0};
-const cor BLUE = {0, 0, 1};
+typedef struct{
+    float pontos[5];
+    char nomes[5][4];
+} placar;
 
-//funcao auxiliar:
+const cor RED = {255, 0, 0};
+const cor GREEN = {0, 255, 0};
+const cor BLUE = {0, 0, 255};
+const cor WHITE = {255, 255, 255};
+const cor GRAY = {127, 127, 127};
+
+//funcoes auxiliares:
+
+void poscursor(int lin, int col){
+    posicao pos = {lin, col};
+    tela_posiciona(pos);
+}
+
 int espera_char(){
     int c;
     do {
@@ -39,7 +46,7 @@ int espera_char(){
 
 //gerenciam pontuacao e placar:
 
-void le_arquivo(float vetor[5], char nomes[5][4]){
+void le_arquivo(placar *p){
     FILE *arq = fopen("./placar.txt", "r");
     if (arq == NULL){
 	    arq = fopen("./placar.txt", "w");
@@ -48,15 +55,15 @@ void le_arquivo(float vetor[5], char nomes[5][4]){
 	    arq = fopen("./placar.txt", "r");
     }
     for (int i = 0; i < 5; i++){
-        fscanf(arq, "%s %f", nomes[i], &vetor[i]);
+        fscanf(arq, "%s %f", p->nomes[i], &(p->pontos[i]));
     }
     fclose(arq);
 }
 
-void grava_arquivo(float vetor[5], char nomes[5][4]){
+void grava_arquivo(placar p){
     FILE *arq = fopen("./placar.txt", "w");
     for(int i = 0; i < 5; i++){
-	fprintf(arq, "%s %.1f\n", nomes[i], vetor[i]);
+	fprintf(arq, "%s %.1f\n", p.nomes[i], p.pontos[i]);
     }
     fclose(arq);
 }
@@ -77,23 +84,22 @@ float pontuacao_cor(int cor_rand, int cor_user){
 
 float pontuacao(cor crand, cor cuser, double tempo){
     float pontos_r, pontos_g, pontos_b, pontos;
-    pontos_r = pontuacao_cor(crand.r, cuser.r);
-    pontos_g = pontuacao_cor(crand.g, cuser.g);
-    pontos_b = pontuacao_cor(crand.b, cuser.b);
+    pontos_r = pontuacao_cor(crand.vermelho, cuser.vermelho);
+    pontos_g = pontuacao_cor(crand.verde, cuser.verde);
+    pontos_b = pontuacao_cor(crand.azul, cuser.azul);
     pontos = 100 - (pontos_r + pontos_g + pontos_b)/3;
     pontos += pontos * 0.05 * (TMAX - tempo);
     return pontos;
 }
 
-int gerencia_placar(float pontos, float placar[5], char nomes[5][4]){
+int gerencia_placar(float pontos, placar *p){
     for (int i = 0; i < 5; i++){
-        if(pontos > placar[i]){
+        if(pontos > p->pontos[i]){
             for (int j = 4; j > i; j--){
-                placar[j] = placar[j-1];
-                strcpy(nomes[j], nomes[j-1]);
+                p->pontos[j] = p->pontos[j-1];
+                strcpy(p->nomes[j], p->nomes[j-1]);
             }
-            placar[i] = pontos;
-            grava_arquivo(placar, nomes);
+            p->pontos[i] = pontos;
             return (i+1);
         }
     }
@@ -104,14 +110,14 @@ void aperta_back(int lin, int col, int *i){
     if ((*i) > 0){
 	(*i)--;
     }
-    tela_lincol(lin, col+(*i));
+    poscursor(lin, col+(*i));
     for(int j = (*i); j < 3; j++){
 	putchar('_');
     }
-    tela_lincol(lin, col+(*i));
+    poscursor(lin, col+(*i));
 }
 
-void pega_nome(char nomes[5][4], int pos, int lin, int col){
+void pega_nome(placar *p, int pos, int lin, int col){
     int c, i = 0;
     bool enter = false;
     while(i < 4){
@@ -124,39 +130,41 @@ void pega_nome(char nomes[5][4], int pos, int lin, int col){
 		aperta_back(lin, col, &i);
             }
             else if (c > 32 && c < 127){
-                nomes[pos][i] = c;
+                p->nomes[pos][i] = c;
                 printf("%c", c);
                 i++;
             }
         }
         else{
-            nomes[pos][i] = '\0';
+            p->nomes[pos][i] = '\0';
             i++;
         }
     }
-    nomes[pos][3] = '\0';
+    p->nomes[pos][3] = '\0';
 }
 
-void gera_posicao(estado partida, float placar[5], char nomes[5][4]){
-    int posicao = gerencia_placar(partida.pontos, placar, nomes);
+void gera_posicao(estado partida, placar *p){
+    int posicao = gerencia_placar(partida.pontos, p);
     if (posicao != 0){
-        tela_lincol(20, 1);
+        poscursor(18, 1);
         printf("VOCE FICOU EM %do LUGAR\nDIGITE SEU NOME: ___", posicao);
-        tela_lincol(21, 18);
-        pega_nome(nomes, posicao-1, 21, 18);
+        poscursor(19, 18);
+        pega_nome(p, posicao-1, 19, 18);
+        grava_arquivo(*p);
     }
 }
 
 //exibem partida:
 
-void barra(int lin, int col, cor cor, int valor){
-    tela_lincol(lin, col);
+void barra(int lin, int col, cor c1, int valor){
+    poscursor(lin, col);
     for(int i = 0; i < 26; i++){
         if (valor/10 == i) {
-            tela_cor_fundo(255, 255, 255); //branco
+            tela_cor_fundo(WHITE); //branco
         }
         else {
-            tela_cor_fundo(i*cor.r*10, i*cor.g*10, i*cor.b*10); //cor escolhida
+            cor c2 = {i*c1.vermelho/255*10, i*c1.verde/255*10, i*c1.azul/255*10};
+            tela_cor_fundo(c2); //cor escolhida
         }
         putchar(' ');
     }
@@ -165,9 +173,9 @@ void barra(int lin, int col, cor cor, int valor){
 }
 
 void quadrado(int lin, int col, cor cor){
-    tela_cor_fundo(cor.r, cor.g, cor.b);
+    tela_cor_fundo(cor);
     for(int i = 0; i < 5; i++){
-        tela_lincol(lin+i, col);
+        poscursor(lin+i, col);
         for(int j = 0; j < 5; j++){
             putchar(' ');
         }
@@ -177,9 +185,9 @@ void quadrado(int lin, int col, cor cor){
 
 void indica_cor(int lin, int col, int cor){
     for(int i = 0; i < 3; i++){
-	tela_lincol(lin+i*2, col);
-	if (i == cor) tela_cor_fundo(0, 255, 0);
-	else tela_cor_fundo(127, 127, 127);
+	poscursor(lin+i*2, col);
+	if (i == cor) tela_cor_fundo(GREEN);
+	else tela_cor_fundo(GRAY);
 	putchar(' ');
     }
     tela_cor_normal();
@@ -189,47 +197,46 @@ void mostra_tela(estado e){
     quadrado(1, 1, e.crand);
     quadrado(7, 1, e.cuser);
     indica_cor(7, 7, e.cor);
-    barra(7, 8, RED, e.cuser.r);
-    barra(9, 8, GREEN, e.cuser.g);
-    barra(11, 8, BLUE, e.cuser.b);
-    tela_lincol(1, 7);
+    barra(7, 8, RED, e.cuser.vermelho);
+    barra(9, 8, GREEN, e.cuser.verde);
+    barra(11, 8, BLUE, e.cuser.azul);
+    poscursor(1, 7);
     printf("PONTUAÇÃO:\t%03.1f", e.pontos);
-    tela_lincol(2, 7);
+    poscursor(2, 7);
     printf("TEMPO:\t\t%03.1lf", e.tempo);
 }
 
 void imprime_cores_finais(int lin, int col, cor cor, bool user){
-    tela_lincol(lin, col);
+    poscursor(lin, col);
     if (user) {
         printf("COR DO USUARIO:");
     }
     else {
         printf("COR GERADA:");
     }
-    quadrado(lin+2, col, cor);
-    barra(lin+2, col+6, RED, cor.r);
-    barra(lin+4, col+6, GREEN, cor.g);
-    barra(lin+6, col+6, BLUE, cor.b);
+    quadrado(lin+1, col, cor);
+    barra(lin+1, col+6, RED, cor.vermelho);
+    barra(lin+3, col+6, GREEN, cor.verde);
+    barra(lin+5, col+6, BLUE, cor.azul);
 }
 
 void mostra_informacoes_finais(estado e){
     tela_limpa();
     imprime_cores_finais(1, 1, e.crand, false);
-    imprime_cores_finais(9, 1, e.cuser, true);
-    tela_lincol(17,1);
+    imprime_cores_finais(8, 1, e.cuser, true);
+    poscursor(15,1);
     printf("PONTUACAO:\t%03.1f\nTEMPO:\t\t%03.1lf", e.pontos, e.tempo);
 }
 
-void mostra_placar(float placar[5], char nomes[5][4]){
-    tela_lincol(0, 0);
-    printf("MELHORES PONTUACOES: \n\n");
+void mostra_placar(int lin, int col, placar p){
+    poscursor(lin, col);
+    printf("MELHORES PONTUACOES:");
     for (int i = 0; i < 5; i++){
-        if(placar[i] >= 0){
-            printf("%3s: %03.1f\n", nomes[i], placar[i]);
+        if(p.pontos[i] >= 0){
+            poscursor(lin+2+i, col);
+            printf("%3s: %03.1f", p.nomes[i], p.pontos[i]);
         }
     }
-    printf("\n\nPRESSIONE QUALQUER TECLA PARA SAIR");
-    espera_char();
 }
 
 //alteram partida:
@@ -277,12 +284,12 @@ void muda_cor(int *cor, int tecla){
 
 void inicializa(estado *e){
     e->inicio = tela_relogio();
-    e->crand.r = rand()%256;
-    e->crand.g = rand()%256;
-    e->crand.b = rand()%256;
-    e->cuser.r = 0;
-    e->cuser.g = 0;
-    e->cuser.b = 0;
+    e->crand.vermelho = rand()%256;
+    e->crand.verde = rand()%256;
+    e->crand.azul = rand()%256;
+    e->cuser.vermelho = 0;
+    e->cuser.verde = 0;
+    e->cuser.azul = 0;
     e->cor = 0;
     e->fim = false;
 }
@@ -299,13 +306,13 @@ void le_tecla(estado *e){
     else{
         switch (e->cor){
             case 0:
-                muda_valor(&(e->cuser.r), tecla);
+                muda_valor(&(e->cuser.vermelho), tecla);
                 break;
             case 1:
-                muda_valor(&(e->cuser.g), tecla);
+                muda_valor(&(e->cuser.verde), tecla);
                 break;
             case 2:
-                muda_valor(&(e->cuser.b), tecla);
+                muda_valor(&(e->cuser.azul), tecla);
                 break;
         }
     }
@@ -334,24 +341,33 @@ void partida(estado *e){
     mostra_informacoes_finais(*e);
 }
 
+//tela de titulo:
+
+void title_screen(void){
+
+}
+
+//a poderosa main:
+
 int main(){
     srand(time(0));
     tela_cria();
     tela_mostra_cursor(false);
     estado e;
-    float placar[5];
-    char nomes[5][4];
+    placar p;
     int continua = -1000;
-    le_arquivo(placar, nomes);
+    le_arquivo(&p);
     do{
+        tela_limpa();
         partida(&e);
-        gera_posicao(e, placar, nomes);
-        tela_lincol(23, 1);
-        printf("PRESSIONE ENTER PARA JOGAR NOVAMENTE\n(qualquer outro botao sai)");
-        continua = espera_char();
-	tela_limpa();
+        gera_posicao(e, &p);
+        mostra_placar(1, 40, p);
+        poscursor(21, 0);
+        printf("PRESSIONE ENTER PRA CONTINUAR\nOU BACKSPACE PARA SAIR");
+        do{
+            continua = espera_char();
+        }while (continua != c_enter && continua != c_back);
     } while(continua == c_enter);
-    mostra_placar(placar, nomes);
     tela_destroi();
     return 0;
 }

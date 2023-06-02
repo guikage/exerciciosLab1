@@ -9,6 +9,19 @@
 
 #include <stdbool.h>
 
+// tipo que representa uma posição na tela
+typedef struct {
+  int linha;
+  int coluna;
+} posicao;
+
+// tipo que representa uma cor
+typedef struct {
+  int vermelho;
+  int verde;
+  int azul;
+} cor;
+
 // inicializa a tela e o teclado
 void tela_cria(void);
 
@@ -19,7 +32,7 @@ void tela_destroi(void);
 void tela_limpa(void);
 
 // posiciona o cursor (0,0 é o canto superior esquerdo)
-void tela_lincol(int lin, int col);
+void tela_posiciona(posicao pos);
 
 // retorna a altura da tela (número de linhas)
 int tela_nlin(void);
@@ -31,10 +44,10 @@ int tela_ncol(void);
 void tela_cor_normal(void);
 
 // seleciona a cor das letras nas próximas impressões
-void tela_cor_letra(int vermelho, int verde, int azul);
+void tela_cor_letra(cor c);
 
 // seleciona a cor do fundo nas próximas impressões
-void tela_cor_fundo(int vermelho, int verde, int azul);
+void tela_cor_fundo(cor c);
 
 // seleciona se o cursor aparece ou não
 void tela_mostra_cursor(bool mostra);

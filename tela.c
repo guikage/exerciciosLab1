@@ -91,9 +91,9 @@ void tela_limpa(void)
   printf("\e[2J");
 }
 
-void tela_lincol(int lin, int col)
+void tela_posiciona(posicao pos)
 {
-  printf("\e[%d;%dH", lin, col);
+  printf("\e[%d;%dH", pos.linha, pos.coluna);
 }
 
 static int nlin, ncol; 
@@ -124,14 +124,14 @@ void tela_cor_normal(void)
   printf("\e[m");
 }
 
-void tela_cor_letra(int vermelho, int verde, int azul)
+void tela_cor_letra(cor c)
 {
-  printf("\e[38;2;%d;%d;%dm", vermelho, verde, azul);
+  printf("\e[38;2;%d;%d;%dm", c.vermelho, c.verde, c.azul);
 }
 
-void tela_cor_fundo(int vermelho, int verde, int azul)
+void tela_cor_fundo(cor c)
 {
-  printf("\e[48;2;%d;%d;%dm", vermelho, verde, azul);
+  printf("\e[48;2;%d;%d;%dm", c.vermelho, c.verde, c.azul);
 }
 
 static int trata_esc(void);

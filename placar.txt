@@ -1,5 +1,5 @@
-lul 173.1
-aaa 139.1
-mok 119.6
-mok 113.1
-gui 88.8
+gui 93.3
+gui 0.0
+AAA -1.0
+AAA -1.0
+AAA -1.0
