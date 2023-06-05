@@ -26,6 +26,9 @@ typedef struct{
 const cor RED = {255, 0, 0};
 const cor GREEN = {0, 255, 0};
 const cor BLUE = {0, 0, 255};
+const cor YELLOW = {255, 255, 0};
+const cor CYAN = {0, 255, 255};
+const cor MAGENTA = {255, 0, 255};
 const cor WHITE = {255, 255, 255};
 const cor GRAY = {127, 127, 127};
 
@@ -39,8 +42,8 @@ void poscursor(int lin, int col){
 int espera_char(){
     int c;
     do {
-	c = tela_le_char();
-    } while(c == c_none);
+	    c = tela_le_char();
+    } while(c == c_none || c == c_resize);
     return c;
 }
 
@@ -63,7 +66,7 @@ void le_arquivo(placar *p){
 void grava_arquivo(placar p){
     FILE *arq = fopen("./placar.txt", "w");
     for(int i = 0; i < 5; i++){
-	fprintf(arq, "%s %.1f\n", p.nomes[i], p.pontos[i]);
+	    fprintf(arq, "%s %.1f\n", p.nomes[i], p.pontos[i]);
     }
     fclose(arq);
 }
@@ -108,11 +111,11 @@ int gerencia_placar(float pontos, placar *p){
 
 void aperta_back(int lin, int col, int *i){
     if ((*i) > 0){
-	(*i)--;
+	    (*i)--;
     }
     poscursor(lin, col+(*i));
     for(int j = (*i); j < 3; j++){
-	putchar('_');
+	    putchar('_');
     }
     poscursor(lin, col+(*i));
 }
@@ -123,7 +126,7 @@ void pega_nome(placar *p, int pos, int lin, int col){
     while(i < 4){
         if(!enter){
             c = tela_le_char();
-            if (c == c_enter){
+            if (c == c_enter && i > 0){
                 enter = true;
             }
             else if (c == c_back){
@@ -185,10 +188,14 @@ void quadrado(int lin, int col, cor cor){
 
 void indica_cor(int lin, int col, int cor){
     for(int i = 0; i < 3; i++){
-	poscursor(lin+i*2, col);
-	if (i == cor) tela_cor_fundo(GREEN);
-	else tela_cor_fundo(GRAY);
-	putchar(' ');
+	    poscursor(lin+i*2, col);
+	    if (i == cor){
+            tela_cor_fundo(GREEN);
+        }
+	    else{
+            tela_cor_fundo(GRAY);
+        }
+	    putchar(' ');
     }
     tela_cor_normal();
 }
@@ -290,6 +297,15 @@ void inicializa(estado *e){
     e->cuser.vermelho = 0;
     e->cuser.verde = 0;
     e->cuser.azul = 0;
+    if(e->crand.vermelho < 128){
+        e->cuser.vermelho = 255;
+    }
+    if(e->crand.verde < 128){
+        e->cuser.verde = 255;
+    }
+    if(e->crand.azul < 128){
+        e->cuser.azul = 255;
+    }
     e->cor = 0;
     e->fim = false;
 }
@@ -343,8 +359,25 @@ void partida(estado *e){
 
 //tela de titulo:
 
-void title_screen(void){
-
+void title_screen(placar p){
+    poscursor(1, 18);
+    tela_cor_letra(RED);
+    putchar('C');
+    tela_cor_letra(YELLOW);
+    putchar('O');
+    tela_cor_letra(GREEN);
+    putchar('L');
+    tela_cor_letra(CYAN);
+    putchar('O');
+    tela_cor_letra(BLUE);
+    putchar('R');
+    tela_cor_letra(MAGENTA);
+    putchar('S');
+    tela_cor_normal();
+    mostra_placar(3, 1, p);
+    poscursor(21, 1);
+    printf("PRESSIONE QUALQUER TECLA PARA JOGAR");
+    espera_char();
 }
 
 //a poderosa main:
@@ -357,6 +390,7 @@ int main(){
     placar p;
     int continua = -1000;
     le_arquivo(&p);
+    title_screen(p);
     do{
         tela_limpa();
         partida(&e);
