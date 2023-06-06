@@ -380,6 +380,23 @@ void title_screen(placar p){
     espera_char();
 }
 
+//o jogo (perdi)
+
+void jogo(estado *e, placar *p){
+    int continua;
+    do{
+        tela_limpa();
+        partida(e);
+        gera_posicao(*e, p);
+        mostra_placar(1, 40, *p);
+        poscursor(21, 0);
+        printf("PRESSIONE ENTER PRA CONTINUAR\nOU BACKSPACE PARA SAIR");
+        do{
+            continua = espera_char();
+        }while (continua != c_enter && continua != c_back);
+    } while(continua == c_enter);
+}
+
 //a poderosa main:
 
 int main(){
@@ -388,20 +405,10 @@ int main(){
     tela_mostra_cursor(false);
     estado e;
     placar p;
-    int continua = -1000;
     le_arquivo(&p);
     title_screen(p);
-    do{
-        tela_limpa();
-        partida(&e);
-        gera_posicao(e, &p);
-        mostra_placar(1, 40, p);
-        poscursor(21, 0);
-        printf("PRESSIONE ENTER PRA CONTINUAR\nOU BACKSPACE PARA SAIR");
-        do{
-            continua = espera_char();
-        }while (continua != c_enter && continua != c_back);
-    } while(continua == c_enter);
+    jogo(&e, &p);
     tela_destroi();
+    printf("tchau");
     return 0;
 }
