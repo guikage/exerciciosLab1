@@ -1,13 +1,14 @@
 #include <stdio.h>
 #include <string.h>
+#include <stdbool.h>
 
-void desloca_esq(char linha[5]);
-void desloca_dir(char linha[5]);
-void desloca_linha(char linha[5]);
+void desloca_linha(char linha[5], bool cresc);
 void imprime_matriz(char grid[7][5]);
-void junta_letras(char linha[5]);
+void junta_letras(char linha[5], bool cresc);
 
 int main(){
+    char tecla;
+    bool cresc;
     char grid[7][5] = {
         {'-', 'A', '-', '-', '-'},
         {'-', '-', 'B', '-', 'A'},
@@ -19,37 +20,54 @@ int main(){
     };
     imprime_matriz(grid);
     for(;;){
-        getchar();
-        for(int i = 0; i < 7; i++){
-            desloca_linha(grid[i]);
+        tecla = getchar();
+        if(tecla == 'a' || tecla == 'd'){
+            if (tecla == 'a') cresc = true;
+            else if (tecla == 'd') cresc = false;
+            for(int i = 0; i < 7; i++){
+                junta_letras(grid[i], cresc);
+                desloca_linha(grid[i], cresc);
+            }
+            imprime_matriz(grid);
         }
-        imprime_matriz(grid);
     }
 }
 
-void desloca_linha(char linha[5]){
+void desloca_linha(char linha[5], bool cresc){
     char aux;
-    for(int i = 0; i < 5; i++){
+    int i, j, li, lj, add;
+    if(cresc){
+        i = 1; li = 5; lj = -1; add = 1;
+    } else {
+        i = 3; li = -1; lj = 5; add = -1;
+    }
+    while(i != li){
         aux = linha[i];
-        int j = i-1;
-        while(linha[j] == '-' && j>-1){
-            linha[j+1] = linha[j];
-            j--;
+        int j = i-add;
+        while(linha[j] == '-' && j!=lj){
+            linha[j+add] = linha[j];
+            j -= add;
         }
-        linha[j+1] = aux;
+        linha[j+add] = aux;
+        i += add;
     }
 }
 
-void junta_letras(char linha[5]){
-    desloca_linha(linha);
-    for(int i = 0; i < 3; i++){
-        if(linha[i] == linha[i+1] && linha[i] == linha[i+2] && linha[i] != '-'){
-            linha[i] = linha[i]+1;
-            linha[i+1] = '-';
-            linha[i+2] = '-';
-        }
+void junta_letras(char linha[5], bool cresc){
+    int i, li, add;
+    if(cresc){
+        i = 0; li = 3; add = 1;
+    } else {
+        i = 4; li = 1; add = -1;
     }
-    desloca_linha(linha);
+    while(i != li){
+        if(linha[i] == linha[i+add] && linha[i] == linha[i+2*add] && linha[i] != '-'){
+            linha[i] = linha[i]+1;
+            linha[i+add] = '-';
+            linha[i+2*add] = '-';
+        }
+        i += add;
+    }
 }
 
 void imprime_matriz(char grid[7][5]){
