@@ -5,11 +5,24 @@
 #include <time.h>
 #include <math.h>
 
+#include "tela/tela.h"
+
+#define TAM_R 64
+#define INI_T 32
+#define DIST_R 0
+
+#define cor_A tela_cria_cor(0.40, 0.00, 0.61);
+#define cor_B tela_cria_cor(0.32, 0.20, 0.60);
+#define cor_C tela_cria_cor(0.24, 0.40, 0.59);
+#define cor_D tela_cria_cor(0.16, 0.60, 0.58);
+#define cor_E tela_cria_cor(0.08, 0.80, 0.57);
+#define cor_F tela_cria_cor(0.00, 1.00, 0.56);
+
 typedef struct{
     char grid[5][5];
     bool cresc, coluna;
     int pontos;
-    char tecla;
+    int tecla;
 } partida;
 
 void inicializa(partida *p);
@@ -20,31 +33,36 @@ void testa_tecla(partida *p);
 
 int main(){
     srand(time(0));
+    tela_inicio(640, 480, "jogo");
     partida p;
     inicializa(&p);
     adiciona_letra(&p);
     imprime_matriz(p);
+    tela_atualiza();
     for(;;){
-        p.tecla = getchar();
-        if(p.tecla == 'a' || p.tecla == 'd' || p.tecla == 'w' || p.tecla == 's'){
+        p.tecla = tela_tecla();
+        if(p.tecla != c_none){
             testa_tecla(&p);
             for(int i = 0; i < 5; i++){
                 desloca(&p, i);
             }
             adiciona_letra(&p);
             imprime_matriz(p);
+            tela_atualiza();
         }
     }
+    tela_fim();
 }
 
 void desloca_linha(partida *p, int x, int i, int li, int lj, int add);
 void desloca_coluna(partida *p, int x, int i, int li, int lj, int add);
 void junta_linha(partida *p, int x, int i, int add);
 void junta_coluna(partida *p, int x, int i, int add);
+void cria_string(char letra, char *str);
+void desenha_quadrado(char letra, int x, int y);
 
 void desloca_linha(partida *p, int x, int i, int li, int lj, int add){
     char aux;
-    int i2 = i;
     while(i != li){
         aux = p->grid[x][i];
         int j = i-add;
@@ -62,7 +80,6 @@ void desloca_linha(partida *p, int x, int i, int li, int lj, int add){
 
 void desloca_coluna(partida *p, int x, int i, int li, int lj, int add){
     char aux;
-    int i2 = i;
     while(i != li){
         aux = p->grid[i][x];
         int j = i-add;
@@ -79,8 +96,7 @@ void desloca_coluna(partida *p, int x, int i, int li, int lj, int add){
 }
 
 void desloca(partida *p, int x){
-    char aux;
-    int i, j, li, lj, add;
+    int i, li, lj, add;
     if(p->cresc){
         i = 0;
         li = 5;
@@ -137,11 +153,9 @@ void junta_coluna(partida *p, int x, int i, int add){
 void imprime_matriz(partida p){
     for(int i = 0; i < 5; i++){
         for(int j = 0; j < 5; j++){
-            putchar(p.grid[i][j]);
+            desenha_quadrado(p.grid[i][j], INI_T+i*TAM_R, INI_T+j*TAM_R);
         }
-        putchar('\n');
     }
-    printf("PONTUACAO: %d\n", p.pontos);
 }
 
 void adiciona_letra(partida *p){
@@ -164,7 +178,7 @@ void inicializa(partida *p){
 
 void testa_tecla(partida *p){
     if(p->tecla == 'a' || p->tecla == 'd'){
-        p->coluna = false;
+        p->coluna = true;
         if (p->tecla == 'a'){
             p->cresc = true;
         }
@@ -173,7 +187,7 @@ void testa_tecla(partida *p){
         }
     }
     else {
-        p->coluna = true;
+        p->coluna = false;
         if (p->tecla == 'w'){
             p->cresc = true;
         }
@@ -181,4 +195,40 @@ void testa_tecla(partida *p){
             p->cresc = false;
         }
     }
+}
+
+void cria_string(char letra, char *str){
+    str[0] = letra;
+    str[1] = '\0';
+}
+
+void desenha_quadrado(char letra, int x, int y){
+    int cor;
+    char str[2];
+    cria_string(letra, str);
+    switch(letra){
+        case 'A':
+            cor = cor_A;
+            break;
+        case 'B':
+            cor = cor_B;
+            break;
+        case 'C':
+            cor = cor_C;
+            break;
+        case 'D':
+            cor = cor_D;
+            break;
+        case 'E':
+            cor = cor_E;
+            break;
+        case 'F':
+            cor = cor_F;
+            break;
+        default:
+            cor = preto;
+            break;
+    }
+    tela_retangulo(x, y, x+TAM_R, y+TAM_R, 2, branco, cor);
+    tela_texto(x+TAM_R/2, y+TAM_R/2, 32, branco, str);
 }
