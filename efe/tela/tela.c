@@ -146,7 +146,7 @@ void tela_prepara_fonte(int tam)
   }
 
   // carrega uma fonte, para poder escrever na tela
-  fonte = al_load_font("Super-Mario-World.ttf", tam, 0);
+  fonte = al_load_font("DejaVuSans.ttf", tam, 0);
   if (fonte == NULL) {
     al_uninstall_system();
     printf("\n\nERRO FATAL\n");
