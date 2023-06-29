@@ -11,12 +11,14 @@
 
 void jogo(partida *p){
     inicializa(p);
-    adiciona_letra(p);
     imprime_matriz(*p);
     imprime_pontuacao(*p);
+    adiciona_letra(p);
+    adiciona_letra(p);
     tela_atualiza();
     bool moveu;
-    for(;;){
+    char debug[20];
+    do{
         p->tecla = tela_tecla();
         if(p->tecla != c_none){
             testa_tecla(p);
@@ -28,11 +30,17 @@ void jogo(partida *p){
             if(p->moveu){
                 adiciona_letra(p);
             }
+            p->casas = verifica_casas(*p);
+            if(p->casas <= 0){
+                p->perdeu = verifica_perdeu(*p);
+            }
         }
         imprime_matriz(*p);
         imprime_pontuacao(*p);
+        sprintf(debug, "%d", p->casas);
+        tela_texto_dir(400, 400, 16, branco, debug);
         tela_atualiza();
-    }
+    }while (!(p->perdeu) && !(p->ganhou));
 }
 
 int main(){

@@ -12,11 +12,14 @@ typedef struct{
     int tecla;
     bool moveu, mover;
     bool ganhou, perdeu;
+    int casas;
 } partida;
 
 void inicializa(partida *p);
 bool desloca(partida *p, int x);
 void adiciona_letra(partida *p);
 void testa_tecla(partida *p);
+int verifica_casas(partida p);
+bool verifica_perdeu(partida p);
 
 #endif
