@@ -99,6 +99,9 @@ bool junta_linha(partida *p, int x, int i, int add){
             p->grid[x][i+2*add] = '-';
             p->pontos += pow(3, (p->grid[x][i] - 'A'))*10;
             moveu = true;
+	    if (p->grid[x][i] == 'F'){
+		p->ganhou = true;
+	    }
         }
         i+=add;
     }
@@ -115,6 +118,9 @@ bool junta_coluna(partida *p, int x, int i, int add){
             p->grid[i+2*add][x] = '-';
             p->pontos += pow(3, (p->grid[i][x] - 'A'))*10;
             moveu = true;
+	    if (p->grid[i][x] == 'F'){
+		p->ganhou = true;
+	    }
         }
         i+=add;
     }
@@ -143,6 +149,8 @@ void inicializa(partida *p){
         }
     }
     p->pontos = 0;
+    p->ganhou = 0;
+    p->perdeu = 0;
 }
 
 void testa_tecla(partida *p){
