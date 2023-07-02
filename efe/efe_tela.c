@@ -8,9 +8,12 @@
 
 #include "efe_logica.h"
 #include "efe_tela.h"
+#include "efe_placar.h"
 
 void imprime_matriz(partida p);
 void imprime_pontuacao(partida p);
+void imprime_fim_de_jogo(partida p);
+void imprime_placar(placar pl);
 
 void cria_string(char letra, char *str);
 void desenha_quadrado(char letra, int x, int y);
@@ -64,4 +67,26 @@ void imprime_pontuacao(partida p){
     sprintf(str, "%d", p.pontos);
     tela_texto_dir(384, 32, 32, branco, "PONTOS:");
     tela_texto_dir(384, 64, 32, branco, str);
+}
+
+void imprime_fim_de_jogo(partida p){
+    imprime_matriz(p);
+    imprime_pontuacao(p);
+    tela_retangulo(180, 200, 460, 280, 4, branco, preto); 
+    if(p.ganhou){
+        tela_texto(320, 240, 32, branco, "VOCE GANHOU!");
+    }
+    else if(p.perdeu){
+        tela_texto(320, 240, 32, branco, "VOCE PERDEU!");
+    }
+    tela_atualiza();
+}
+
+void imprime_placar(placar pl){
+    char str[30];
+    for (int i = 0; i < 5; i++){
+        sprintf(str, "%s: %d", pl.nome[i], pl.pontos[i]);
+        tela_texto(320, 160+(40*i), 32, branco, str);
+    }
+    tela_atualiza();
 }

@@ -13,6 +13,7 @@ void testa_tecla(partida *p);
 int verifica_casas(partida p);
 bool verifica_perdeu(partida p);
 
+void inicializa_desloca(bool cresc, int *i, int *li, int *lj, int *add);
 bool desloca_linha(partida *p, int x, int i, int li, int lj, int add);
 bool desloca_coluna(partida *p, int x, int i, int li, int lj, int add);
 bool junta_linha(partida *p, int x, int i, int add);
@@ -58,21 +59,25 @@ bool desloca_coluna(partida *p, int x, int i, int li, int lj, int add){
     return moveu;
 }
 
+void inicializa_desloca(bool cresc, int *i, int *li, int *lj, int *add){
+    if(cresc){
+        *i = 0;
+        *li = 5;
+        *lj = -1;
+        *add = 1;
+    }
+    else {
+        *i = 4;
+        *li = -1;
+        *lj = 5;
+        *add = -1;
+    }
+}
+
 bool desloca(partida *p, int x){
     int i, li, lj, add;
     bool moveu1, moveu2, moveu3, moveu4;
-    if(p->cresc){
-        i = 0;
-        li = 5;
-        lj = -1;
-        add = 1;
-    }
-    else {
-        i = 4;
-        li = -1;
-        lj = 5;
-        add = -1;
-    }
+    inicializa_desloca(p->cresc, &i, &li, &lj, &add);
     if(p->coluna){
         moveu1 = junta_coluna(p, x, i, add);
         moveu2 = desloca_coluna(p, x, i, li, lj, add);

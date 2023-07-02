@@ -2,6 +2,7 @@
 #define _efe_tela_h_
 
 #include "efe_logica.h"
+#include "efe_placar.h"
 
 #define TAM_R 64
 #define INI_T 32
@@ -16,6 +17,8 @@
 
 void imprime_matriz(partida p);
 void imprime_pontuacao(partida p);
+void imprime_fim_de_jogo(partida p);
+void imprime_placar(placar pl);
 
 void cria_string(char letra, char *str);
 void desenha_quadrado(char letra, int x, int y);
