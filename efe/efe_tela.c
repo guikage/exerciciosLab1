@@ -82,11 +82,22 @@ void imprime_fim_de_jogo(partida p){
     tela_atualiza();
 }
 
+void imprime_pause(partida p){
+    imprime_matriz(p);
+    imprime_pontuacao(p);
+    tela_retangulo(180, 200, 460, 280, 4, branco, preto); 
+    tela_texto(320, 240, 32, branco, "PAUSE");
+    tela_atualiza();
+}
+
 void imprime_placar(placar pl){
     char str[30];
+    tela_texto(320, 160, 48, branco, "RANKING");
     for (int i = 0; i < 5; i++){
-        sprintf(str, "%s: %d", pl.nome[i], pl.pontos[i]);
-        tela_texto(320, 160+(40*i), 32, branco, str);
+        if(pl.pontos[i] > -1){
+            sprintf(str, "%s: %d", pl.nome[i], pl.pontos[i]);
+            tela_texto(320, 240+(40*i), 32, branco, str);
+	}
     }
     tela_atualiza();
 }

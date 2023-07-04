@@ -11,7 +11,7 @@ typedef struct{
     int pontos;
     int tecla;
     bool moveu, mover;
-    bool ganhou, perdeu;
+    bool ganhou, perdeu, saiu, pausou;
     int casas;
 } partida;
 

@@ -1,5 +1,6 @@
 #include <stdio.h>
 #include <stdlib.h>
+#include <string.h>
 #include <stdbool.h>
 #include <time.h>
 #include <math.h>
@@ -10,22 +11,39 @@
 #include "efe_tela.h"
 #include "efe_placar.h"
 
+void aperta_enter(placar *p, int i, int pos){
+    if(i > 0){
+        p->nome[pos][i] = '\0';
+    }
+    else{
+	strcpy(p->nome[pos], "AAA");
+    }
+}
+
+void aperta_back(placar *p, int *i, int pos){
+    if(*i > 0){
+        (*i)--;
+        p->nome[pos][(*i)] = '\0';
+    }
+}
+
 void pega_nome(placar *p, int pos){
     int c, i = 0;
+    strcpy(p->nome[pos], " ");
     while(i < 7){
         c = tela_tecla();
-        if (c == c_enter && i > 0){
-            p->nome[pos][i] = '\0';
+        if (c == c_enter){
+	    aperta_enter(p, i, pos);
             break;
         }
         else if (c == c_back){
-            p->nome[pos][i] = '\0';
-            if(i > 0){
-                i--;
-            }
+	    aperta_back(p, &i, pos);
         }
         else if (c > 32 && c < 127){
             p->nome[pos][i] = c;
+	    if(i < 6){
+            	p->nome[pos][i+1] = '\0';
+	    }
             i++;
         }
         if (c != c_none){
@@ -43,8 +61,22 @@ void gera_posicao(partida p, placar *pl){
         grava_arquivo(*pl);
         sprintf(str, "VOCE FICOU EM %do LUGAR!", posicao);
         tela_texto(320, 120, 32, branco, str);
+        tela_atualiza();
         pega_nome(pl, posicao-1);
     }
+}
+
+void pause(partida *p){
+    int sair;
+    imprime_pause(*p);
+    do{
+	    sair = tela_tecla();
+    }while(sair != c_enter && sair != c_esc);
+    if(sair == c_esc){
+        p->saiu = true;
+	p->pontos = -2;
+    }
+    p->pausou = false;
 }
 
 void fim_de_jogo(partida p, placar *pl){
@@ -61,18 +93,23 @@ void loop_jogo(partida *p){
     p->tecla = tela_tecla();
     if(p->tecla != c_none){
         testa_tecla(p);
-        p->moveu = false;
-        for(int i = 0; i < 5; i++){
-            moveu = desloca(p, i);
-	    p->moveu = p->moveu || moveu;
-        }
-        if(p->moveu){
-            adiciona_letra(p);
-        }
-        p->casas = verifica_casas(*p);
-        if(p->casas <= 0){
-            p->perdeu = verifica_perdeu(*p);
-        }
+	if(p->mover){
+            p->moveu = false;
+            for(int i = 0; i < 5; i++){
+                moveu = desloca(p, i);
+	        p->moveu = p->moveu || moveu;
+            }
+            if(p->moveu){
+                adiciona_letra(p);
+            }
+            p->casas = verifica_casas(*p);
+            if(p->casas <= 0){
+                p->perdeu = verifica_perdeu(*p);
+            }
+	}
+    }
+    if(p->pausou){
+	pause(p);
     }
     imprime_matriz(*p);
     imprime_pontuacao(*p);
@@ -96,8 +133,10 @@ void jogo(partida *p, placar *pl){
     tela_atualiza();
     do{
         loop_jogo(p);
-    }while (!(p->perdeu) && !(p->ganhou));
-    fim_de_jogo(*p, pl);
+    }while (!(p->perdeu) && !(p->ganhou) && !(p->saiu));
+    if(!(p->saiu)){
+    	fim_de_jogo(*p, pl);
+    }
 }
 
 int muda_seletor(int seletor){
@@ -126,7 +165,7 @@ int muda_seletor(int seletor){
 }
 
 int menu(){
-    int seletor = 0, seletor2, coord;
+    int seletor = 0, seletor2;
     do{
         tela_texto(320, 160, 64, branco, "EFE");
         tela_texto(320, 300, 32, branco, "JOGAR");
@@ -136,18 +175,15 @@ int menu(){
         if(seletor2 != -1){
 	    seletor = seletor2;
         }
-        switch(seletor){
-	    case 0:
-                coord = 300;
-                break;
-	    case 1:
-                coord = 340;
-                break;
-       	    case 2:
-                coord = 380;
-                break;
+        if(seletor == 0){
+            tela_texto(200, 300, 32, branco, ">");
         }
-        tela_texto(200, coord, 32, branco, "-");
+        else if(seletor == 1){
+            tela_texto(200, 340, 32, branco, ">");
+        }
+        else if(seletor == 2){
+            tela_texto(200, 380, 32, branco, ">");
+        }
         tela_atualiza();
     }while(seletor2 != -1);
     return seletor;
@@ -160,22 +196,18 @@ int main(){
     placar pl;
     le_arquivo(&pl);
     int seletor;
-    bool sair = false;
-    while(!sair){
+    for(;;){
         seletor = menu();
-        switch(seletor){
-            case 0:
-                jogo(&p, &pl);
-                break;
-            case 1:
-                ranking(pl);
-                break;
-            case 2:
-                sair = true;
-                break;
-            default:
-                break;
+        if(seletor == 0){
+            jogo(&p, &pl);
+        }
+        else if(seletor == 1){
+            ranking(pl);
+        }
+        else if(seletor == 2){
+            break;
         }
     }
+    grava_arquivo(pl);
     tela_fim();
 }

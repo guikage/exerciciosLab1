@@ -1,5 +1,5 @@
-gui 2592
-gui 2573
-A -1
+bbbbbb 3021
+nome 2744
+AAA 1673
 A -1
 A -1

@@ -18,6 +18,7 @@
 void imprime_matriz(partida p);
 void imprime_pontuacao(partida p);
 void imprime_fim_de_jogo(partida p);
+void imprime_pause(partida p);
 void imprime_placar(placar pl);
 
 void cria_string(char letra, char *str);

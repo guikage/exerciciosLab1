@@ -19,7 +19,7 @@ bool desloca_coluna(partida *p, int x, int i, int li, int lj, int add);
 bool junta_linha(partida *p, int x, int i, int add);
 bool junta_coluna(partida *p, int x, int i, int add);
 
-bool desloca_linha(partida *p, int x, int i, int li, int lj, int add){
+bool desloca_coluna(partida *p, int x, int i, int li, int lj, int add){
     char aux;
     bool moveu = false;
     while(i != li){
@@ -39,7 +39,7 @@ bool desloca_linha(partida *p, int x, int i, int li, int lj, int add){
     return moveu;
 }
 
-bool desloca_coluna(partida *p, int x, int i, int li, int lj, int add){
+bool desloca_linha(partida *p, int x, int i, int li, int lj, int add){
     char aux;
     bool moveu = false;
     while(i != li){
@@ -94,7 +94,7 @@ bool desloca(partida *p, int x){
 }
 
 
-bool junta_linha(partida *p, int x, int i, int add){
+bool junta_coluna(partida *p, int x, int i, int add){
     int li = i+3*add;
     bool moveu = false;
     while(i != li){
@@ -113,7 +113,7 @@ bool junta_linha(partida *p, int x, int i, int add){
     return moveu;
 }
 
-bool junta_coluna(partida *p, int x, int i, int add){
+bool junta_linha(partida *p, int x, int i, int add){
     int li = i+3*add;
     bool moveu = false;
     while(i != li){
@@ -156,26 +156,35 @@ void inicializa(partida *p){
     p->pontos = 0;
     p->ganhou = 0;
     p->perdeu = 0;
+    p->pausou = 0;
+    p->saiu = 0;
 }
 
 void testa_tecla(partida *p){
-    if(p->tecla == 'a' || p->tecla == 'd'){
-        p->coluna = true;
-        if (p->tecla == 'a'){
+    p->mover = true;
+    if(p->tecla == c_left || p->tecla == c_right){
+        p->coluna = false;
+        if (p->tecla == c_left){
             p->cresc = true;
         }
-        else if (p->tecla == 'd'){
+        else if (p->tecla == c_right){
             p->cresc = false;
         }
     }
-    else {
-        p->coluna = false;
-        if (p->tecla == 'w'){
+    else if(p->tecla == c_up || p->tecla == c_down){
+        p->coluna = true;
+        if (p->tecla == c_up){
             p->cresc = true;
         }
-        else if (p->tecla == 's'){
+        else if (p->tecla == c_down){
             p->cresc = false;
         }
+    }
+    else{
+        p->mover = false;
+	if(p->tecla == c_enter){
+	    p->pausou = true;
+	}
     }
 }
 
@@ -193,7 +202,7 @@ int verifica_casas(partida p){
 
 bool verifica_perdeu(partida p){
     int i, j;
-    for (i = 0; i < 3; i++){
+    for (i = 0; i < 5; i++){
         for (j = 0; j < 3; j++){
             if(p.grid[i][j] == p.grid[i][j+1] && p.grid[i][j] == p.grid[i][j+2]){
                 return false;
