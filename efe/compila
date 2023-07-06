@@ -1,1 +1,1 @@
-gcc -o efe efe_main.c efe_logica.c efe_logica.h efe_tela.c efe_tela.h tela/tela.c tela/tela.h -lm -lallegro_font -lallegro_color -lallegro_ttf -lallegro_primitives -lallegro
+gcc -o efe efe_main.c efe_logica.c efe_logica.h efe_tela.c efe_tela.h efe_placar.c efe_placar.h tela/tela.c tela/tela.h -lm -lallegro_font -lallegro_color -lallegro_ttf -lallegro_primitives -lallegro
