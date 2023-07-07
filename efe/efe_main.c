@@ -11,47 +11,44 @@
 #include "efe_tela.h"
 #include "efe_placar.h"
 
-void aperta_enter(placar *p, int i, int pos){
+void aperta_enter(placar *pl, int i, int pos){
     if(i > 0){
-        p->nome[pos][i] = '\0';
+        pl->nome[pos][i] = '\0';
     }
     else{
-	strcpy(p->nome[pos], "AAA");
+	strcpy(pl->nome[pos], "AAA");
     }
 }
 
-void aperta_back(placar *p, int *i, int pos){
+void aperta_back(placar *pl, int *i, int pos){
     if(*i > 0){
         (*i)--;
-        p->nome[pos][(*i)] = '\0';
+        pl->nome[pos][(*i)] = '\0';
     }
 }
 
-void pega_nome(placar *p, int pos){
+void pega_nome(placar *pl, int pos){
     int c, i = 0;
-    strcpy(p->nome[pos], " ");
-    while(i < 7){
+    strcpy(pl->nome[pos], " ");
+    for(;;){
         c = tela_tecla();
         if (c == c_enter){
-	    aperta_enter(p, i, pos);
+            aperta_enter(pl, i, pos);
             break;
         }
         else if (c == c_back){
-	    aperta_back(p, &i, pos);
+            aperta_back(pl, &i, pos);
         }
         else if (c > 32 && c < 127){
-            p->nome[pos][i] = c;
-	    if(i < 6){
-            	p->nome[pos][i+1] = '\0';
-	    }
-            i++;
+	        if(i < 15){
+                pl->nome[pos][i] = c;
+                pl->nome[pos][i+1] = '\0';
+                i++;
+	        }
         }
-        if (c != c_none){
-            tela_texto(320, 180, 32, branco, p->nome[pos]);
-            tela_atualiza();
-        }
+        imprime_nome(*pl, pos);
     }
-    p->nome[pos][6] = '\0';
+    pl->nome[pos][15] = '\0';
 }
 
 void gera_posicao(partida p, placar *pl){
@@ -59,9 +56,6 @@ void gera_posicao(partida p, placar *pl){
     int posicao = gerencia_placar(p.pontos, pl);
     if (posicao != 0){
         grava_arquivo(*pl);
-        sprintf(str, "VOCE FICOU EM %do LUGAR!", posicao);
-        tela_texto(320, 120, 32, branco, str);
-        tela_atualiza();
         pega_nome(pl, posicao-1);
     }
 }
@@ -74,7 +68,7 @@ void pause(partida *p){
     }while(sair != c_enter && sair != c_esc);
     if(sair == c_esc){
         p->saiu = true;
-	p->pontos = -2;
+        p->pontos = -2;
     }
     p->pausou = false;
 }

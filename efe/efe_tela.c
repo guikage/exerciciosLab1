@@ -14,6 +14,7 @@ void imprime_matriz(partida p);
 void imprime_pontuacao(partida p);
 void imprime_fim_de_jogo(partida p);
 void imprime_placar(placar pl);
+void imprime_nome(placar pl, int pos);
 
 void cria_string(char letra, char *str);
 void desenha_quadrado(char letra, int x, int y);
@@ -27,7 +28,12 @@ void imprime_matriz(partida p){
 }
 
 void cria_string(char letra, char *str){
-    str[0] = letra;
+    if(letra == '-'){
+        str[0] = ' ';
+    }
+    else{
+        str[0] = letra;
+    }
     str[1] = '\0';
 }
 
@@ -99,5 +105,14 @@ void imprime_placar(placar pl){
             tela_texto(320, 240+(40*i), 32, branco, str);
 	}
     }
+    tela_atualiza();
+}
+
+void imprime_nome(placar pl, int pos){
+    char str[26];
+    sprintf(str, "VOCE FICOU EM %do LUGAR!", pos+1);
+    tela_texto(320, 120, 32, branco, str);
+    tela_retangulo(120, 200, 520, 280, 4, branco, preto);
+    tela_texto(320, 240, 32, branco, pl.nome[pos]);
     tela_atualiza();
 }

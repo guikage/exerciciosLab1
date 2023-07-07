@@ -6,7 +6,7 @@
 
 typedef struct{
     int pontos[5];
-    char nome[5][7];
+    char nome[5][16];
     bool ganhou[5];
 } placar;
 

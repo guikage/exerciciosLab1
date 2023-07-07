@@ -20,8 +20,6 @@ void imprime_pontuacao(partida p);
 void imprime_fim_de_jogo(partida p);
 void imprime_pause(partida p);
 void imprime_placar(placar pl);
-
-void cria_string(char letra, char *str);
-void desenha_quadrado(char letra, int x, int y);
+void imprime_nome(placar pl, int pos);
 
 #endif
