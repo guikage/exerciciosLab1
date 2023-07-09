@@ -7,7 +7,7 @@
 #include "efe_logica.h"
 
 void inicializa(partida *p);
-bool desloca(partida *p, int x);
+bool desloca_todos(partida *p);
 void adiciona_letra(partida *p);
 void testa_tecla(partida *p);
 int verifica_casas(partida p);
@@ -16,6 +16,7 @@ bool verifica_perdeu(partida p);
 void inicializa_desloca(bool cresc, int *i, int *li, int *lj, int *add);
 bool desloca_linha(partida *p, int x, int i, int li, int lj, int add);
 bool desloca_coluna(partida *p, int x, int i, int li, int lj, int add);
+bool desloca_um(partida *p, int x);
 bool junta_linha(partida *p, int x, int i, int add);
 bool junta_coluna(partida *p, int x, int i, int add);
 
@@ -74,7 +75,7 @@ void inicializa_desloca(bool cresc, int *i, int *li, int *lj, int *add){
     }
 }
 
-bool desloca(partida *p, int x){
+bool deslocaum(partida *p, int x){
     int i, li, lj, add;
     bool moveu1, moveu2, moveu3, moveu4;
     inicializa_desloca(p->cresc, &i, &li, &lj, &add);
@@ -93,6 +94,14 @@ bool desloca(partida *p, int x){
     return (moveu1 || moveu2 || moveu3 || moveu4);
 }
 
+bool desloca_todos(partida *p){
+    p->moveu = false;
+    bool moveu;
+    for(int i = 0; i < 5; i++){
+        moveu = deslocaum(p, i);
+        p->moveu = p->moveu || moveu;
+    }
+}
 
 bool junta_coluna(partida *p, int x, int i, int add){
     int li = i+3*add;
@@ -104,9 +113,9 @@ bool junta_coluna(partida *p, int x, int i, int add){
             p->grid[x][i+2*add] = '-';
             p->pontos += pow(3, (p->grid[x][i] - 'A'))*10;
             moveu = true;
-	    if (p->grid[x][i] == 'F'){
-		p->ganhou = true;
-	    }
+            if (p->grid[x][i] == 'F'){
+                p->ganhou = true;
+            }
         }
         i+=add;
     }
@@ -123,9 +132,9 @@ bool junta_linha(partida *p, int x, int i, int add){
             p->grid[i+2*add][x] = '-';
             p->pontos += pow(3, (p->grid[i][x] - 'A'))*10;
             moveu = true;
-	    if (p->grid[i][x] == 'F'){
-		p->ganhou = true;
-	    }
+            if (p->grid[i][x] == 'F'){
+                p->ganhou = true;
+            }
         }
         i+=add;
     }
@@ -161,30 +170,26 @@ void inicializa(partida *p){
 }
 
 void testa_tecla(partida *p){
-    p->mover = true;
-    if(p->tecla == c_left || p->tecla == c_right){
-        p->coluna = false;
-        if (p->tecla == c_left){
+    if(p->tecla == c_left || p->tecla == c_right || p->tecla == c_up || p->tecla == c_down){
+        p->mover = true;
+        if(p->tecla == c_left || p->tecla == c_right){
+            p->coluna = false;
+        }
+        else if(p->tecla == c_up || p->tecla == c_down){
+            p->coluna = true;
+        }
+        if (p->tecla == c_up || p->tecla == c_left){
             p->cresc = true;
         }
-        else if (p->tecla == c_right){
-            p->cresc = false;
-        }
-    }
-    else if(p->tecla == c_up || p->tecla == c_down){
-        p->coluna = true;
-        if (p->tecla == c_up){
-            p->cresc = true;
-        }
-        else if (p->tecla == c_down){
+        else if (p->tecla == c_down || p->tecla == c_right){
             p->cresc = false;
         }
     }
     else{
         p->mover = false;
-	if(p->tecla == c_enter){
-	    p->pausou = true;
-	}
+	    if(p->tecla == c_enter){
+	        p->pausou = true;
+	    }
     }
 }
 

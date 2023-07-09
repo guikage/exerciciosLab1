@@ -18,6 +18,7 @@ void imprime_nome(placar pl, int pos);
 
 void cria_string(char letra, char *str);
 void desenha_quadrado(char letra, int x, int y);
+int cor_quadrado(char letra);
 
 void imprime_matriz(partida p){
     for(int i = 0; i < 5; i++){
@@ -37,33 +38,29 @@ void cria_string(char letra, char *str){
     str[1] = '\0';
 }
 
-void desenha_quadrado(char letra, int x, int y){
-    int cor;
-    char str[2];
-    cria_string(letra, str);
+int cor_quadrado(char letra){
     switch(letra){
         case 'A':
-            cor = cor_A;
-            break;
+            return cor_A;
         case 'B':
-            cor = cor_B;
-            break;
+            return cor_B;
         case 'C':
-            cor = cor_C;
-            break;
+            return cor_C;
         case 'D':
-            cor = cor_D;
-            break;
+            return cor_D;
         case 'E':
-            cor = cor_E;
-            break;
+            return cor_E;
         case 'F':
-            cor = cor_F;
-            break;
+            return cor_F;
         default:
-            cor = preto;
-            break;
+            return preto;
     }
+}
+
+void desenha_quadrado(char letra, int x, int y){
+    char str[2];
+    cria_string(letra, str);
+    int cor = cor_quadrado(letra);
     tela_retangulo(x, y, x+TAM_R, y+TAM_R, 2, branco, cor);
     tela_texto(x+TAM_R/2, y+TAM_R/2, 32, branco, str);
 }

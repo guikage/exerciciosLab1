@@ -83,16 +83,11 @@ void fim_de_jogo(partida p, placar *pl){
 }
 
 void loop_jogo(partida *p){
-    bool moveu;
     p->tecla = tela_tecla();
     if(p->tecla != c_none){
         testa_tecla(p);
-	if(p->mover){
-            p->moveu = false;
-            for(int i = 0; i < 5; i++){
-                moveu = desloca(p, i);
-	        p->moveu = p->moveu || moveu;
-            }
+        if(p->mover){
+            p->moveu = desloca_todos(p);
             if(p->moveu){
                 adiciona_letra(p);
             }
@@ -100,10 +95,10 @@ void loop_jogo(partida *p){
             if(p->casas <= 0){
                 p->perdeu = verifica_perdeu(*p);
             }
-	}
+        }
     }
     if(p->pausou){
-	pause(p);
+        pause(p);
     }
     imprime_matriz(*p);
     imprime_pontuacao(*p);
