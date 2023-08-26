@@ -87,7 +87,7 @@ void loop_jogo(partida *p){
     if(p->tecla != c_none){
         testa_tecla(p);
         if(p->mover){
-            p->moveu = desloca_todos(p);
+            desloca_todos(p);
             if(p->moveu){
                 adiciona_letra(p);
             }
@@ -199,4 +199,5 @@ int main(){
     }
     grava_arquivo(pl);
     tela_fim();
+    return 0;
 }

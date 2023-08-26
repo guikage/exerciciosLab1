@@ -122,7 +122,6 @@ void aperta_back(int lin, int col, int *i){
 
 void pega_nome(placar *p, int pos, int lin, int col){
     int c, i = 0;
-    bool enter = false;
     while(i < 4){
         c = tela_le_char();
         if (c == c_enter && i > 0){

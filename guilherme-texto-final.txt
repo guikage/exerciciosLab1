@@ -1,0 +1,91 @@
+A partir de uma análise, descrita no texto, venho solicitar a nota de 9.1 na disciplina. A nota solicitada foi pensada em base nos critérios pedidos no github, com alguns pesos alterados para melhor ajustar as notas de acordo com o que eu creio ser mais importante na disciplina.
+
+Trabalhos: 8.9
+Em todos os trabalhos, foi feito o que foi pedido, com exceção de alguns detalhes (pontuados em cada trabalho). Além disso, todos estão funcionando em sistemas Linux (Arch Linux) e serviram para aprender os conceitos relacionados a eles. Abaixo, os critérios para a decisão da nota solicitada.
+
+T1: 9/10
+- Foi feito o que foi pedido? 3/4
+- Funciona? 3/3
+- Serviu pra aprender os conceitos relacionados? 3/3
+
+T2: 10/10
+- Foi feito o que foi pedido? 4/4
+- Funciona? 3/3
+- Serviu pra aprender os conceitos relacionados? 3/3
+
+T3: 9/10
+- Foi feito o que foi pedido? 3/4 (pontuação calculada de modo incorreto)
+- Funciona? 3/3
+- Serviu pra aprender os conceitos relacionados? 3/3
+
+T4: 10/10
+- Foi feito o que foi pedido? 4/4
+- Funciona? 3/3
+- Serviu pra aprender os conceitos relacionados? 3/3
+
+T5: 8/10
+- Foi feito o que foi pedido? 2/4 (número de linhas excedido em algumas funções, corrigido na versão final)
+- Funciona? 3/3
+- Serviu pra aprender os conceitos relacionados? 3/3
+
+
+Conhecimentos: 9.3
+
+Tipos básicos de dados (char, int, bool, float, etc): 10/10
+- Saber o que é: 3/3;
+- Saber pra que serve: 3/3;
+- Saber como usar: 4/4.
+
+Variáveis: 10/10
+- Saber o que é: 3/3;
+- Saber pra que serve: 3/3;
+- Saber como usar: 4/4.
+
+Entrada e saída: 10/10
+- Saber o que é: 3/3;
+- Saber pra que serve: 3/3;
+- Saber como usar: 4/4.
+
+Seleção: 9/10
+- Saber o que é: 3/3;
+- Saber pra que serve: 3/3;
+- Saber como usar: 3/4.
+
+Laços: 9/10
+- Saber o que é: 3/3;
+- Saber pra que serve: 3/3;
+- Saber como usar: 3/4.
+
+Funções: 9/10
+- Saber o que é: 3/3;
+- Saber pra que serve: 3/3;
+- Saber como usar: 3/4.
+
+Vetores e strings: 9/10
+- Saber o que é: 3/3;
+- Saber pra que serve: 3/3;
+- Saber como usar: 3/4.
+
+Registros: 10/10
+- Saber o que é: 3/3;
+- Saber pra que serve: 3/3;
+- Saber como usar: 4/4.
+
+Arquivos: 10/10
+- Saber o que é: 3/3;
+- Saber pra que serve: 3/3;
+- Saber como usar: 4/4.
+
+Alocação dinâmica: 7/10
+- Saber o que é: 3/3;
+- Saber pra que serve: 3/3;
+- Saber como usar: 1/4.
+
+Conclusões finais:
+Ao considerar as duas notas tendo peso equivalente, a média aritmética obtida entre elas é 9,1.
+
+A nota relativa aos trabalhos foi feita usando média ponderada.
+(10+10+9+(10*2)+(8*4))/(1+1+1+2+4)
+
+A nota relativa aos conhecimentos foi feita usando média aritmética.
+(10+10+10+9+9+9+9+10+10+7)/10

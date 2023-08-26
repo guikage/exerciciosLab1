@@ -16,7 +16,7 @@ typedef struct{
 } partida;
 
 void inicializa(partida *p);
-bool desloca_todos(partida *p);
+void desloca_todos(partida *p);
 void adiciona_letra(partida *p);
 void testa_tecla(partida *p);
 int verifica_casas(partida p);

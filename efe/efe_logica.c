@@ -7,7 +7,7 @@
 #include "efe_logica.h"
 
 void inicializa(partida *p);
-bool desloca_todos(partida *p);
+void desloca_todos(partida *p);
 void adiciona_letra(partida *p);
 void testa_tecla(partida *p);
 int verifica_casas(partida p);
@@ -94,12 +94,12 @@ bool deslocaum(partida *p, int x){
     return (moveu1 || moveu2 || moveu3 || moveu4);
 }
 
-bool desloca_todos(partida *p){
+void desloca_todos(partida *p){
     p->moveu = false;
-    bool moveu;
+    bool moveu2;
     for(int i = 0; i < 5; i++){
-        moveu = deslocaum(p, i);
-        p->moveu = p->moveu || moveu;
+        moveu2 = deslocaum(p, i);
+        p->moveu = p->moveu || moveu2;
     }
 }
 

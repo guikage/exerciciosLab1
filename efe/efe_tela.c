@@ -100,7 +100,7 @@ void imprime_placar(placar pl){
         if(pl.pontos[i] > -1){
             sprintf(str, "%s: %d", pl.nome[i], pl.pontos[i]);
             tela_texto(320, 240+(40*i), 32, branco, str);
-	}
+        }
     }
     tela_atualiza();
 }
